@@ -14,23 +14,37 @@ func main() {
 	}
 	desired := webdriver.Capabilities{"Platform": "Linux"}
 	required := webdriver.Capabilities{}
+	sessiondanding, err := chromeDriver.NewSession(desired, required)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = sessiondanding.Url("http://www.dandinglong.site")
+	if err != nil {
+		fmt.Println(err)
+	}
 	session, err := chromeDriver.NewSession(desired, required)
-	if err != nil {
-		fmt.Println(err)
+	var i int
+	for i=0;i<10;i++{
+		if err != nil {
+			fmt.Println(err)
+		}
+		err = session.Url("https://www.toutiao.com/a6524099463198278151/")
+		if err != nil {
+			fmt.Println(err)
+		}
+		time.Sleep(2 * time.Second)
+		el, _ :=session.FindElement(webdriver.TagName,"body");
+		bodysize, _ :=el.Size()
+		fmt.Println(bodysize)
+		cookie,_:=session.GetCookies()
+		fmt.Println(cookie)
+		key:="\ue00f"
+		session.SendKeysOnActiveElement(key)
+		time.Sleep(1 * time.Second)
+		session.SendKeysOnActiveElement(key)
+		time.Sleep(4 * time.Second)
 	}
-	err = session.Url("http://www.dandinglong.site")
-	if err != nil {
-		fmt.Println(err)
-	}
-	time.Sleep(2 * time.Second)
-	//el, _ :=session.FindElement(webdriver.ClassName,"search-field");
-	key:="\ue00f"
-	session.SendKeysOnActiveElement(key)
-	value1, value2 := 4, 7
-	script := "return arguments[0] + arguments[1]"
-	res, err := session.ExecuteScript(script, []interface{}{value1, value2})
-	fmt.Println(string(res))
-	time.Sleep(4 * time.Second)
+
 	session.Delete()
 	chromeDriver.Stop()
 }

@@ -71,6 +71,7 @@ func (tt *ToutiaoContainer) Login() {
 	req, _ =http.NewRequest("POST","https://www.toutiao.com/c/user/follow/",strings.NewReader("user_id=51045089537"))
 	req.Header=header
 	resp, _ = tt.client.Do(req)
+	tt.client.Jar.Cookies()
 	data, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	fmt.Println(string(data))
