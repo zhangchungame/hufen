@@ -12,13 +12,14 @@ import (
 	"wiki.ruokuai.com/ApiDemo_Go.ashx/rkdama"
 	"os"
 	"strings"
+	"encoding/json"
 )
 
-type ToutiaoContainer struct {
+type ToutiaoService struct {
 	client http.Client
 }
 
-func (tt *ToutiaoContainer) Login() {
+func (tt *ToutiaoService) Login() ToutiaoLoginReturn{
 	header:=http.Header{}
 	header.Add("Host","www.toutiao.com")
 	header.Add("User-Agent","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0")
@@ -47,7 +48,9 @@ func (tt *ToutiaoContainer) Login() {
 	req, _ =http.NewRequest("GET","https://sso.toutiao.com/send_activation_code/?mobile=13681736848&captcha="+creatreurlsult.Result+"&type=24",nil)
 	req.Header=header
 	resp, _ = tt.client.Do(req)
+	data, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
+	fmt.Println(string(data))
 	var code string
 	fmt.Println("输入code")
 	fmt.Scan(&code)
@@ -60,21 +63,12 @@ func (tt *ToutiaoContainer) Login() {
 
 	data, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-	fmt.Println(string(data))
-
-	req, _ =http.NewRequest("GET","https://www.toutiao.com/ch/news_hot/",nil)
-	req.Header=header
-	resp, _ = tt.client.Do(req)
-	data, _ = ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-
-	req, _ =http.NewRequest("POST","https://www.toutiao.com/c/user/follow/",strings.NewReader("user_id=51045089537"))
-	req.Header=header
-	resp, _ = tt.client.Do(req)
-	tt.client.Jar.Cookies()
-	data, _ = ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	fmt.Println(string(data))
+	var m  ToutiaoLoginReturn
+	err = json.Unmarshal([]byte(string(data)), &m)
+	if (err!=nil){
+		fmt.Println(err)
+	}
+	return m
 }
 
 /**
@@ -95,8 +89,8 @@ func mkdir(path string) {
 		os.MkdirAll(path, 0777)
 	}
 }
-func NewToutiao() *ToutiaoContainer {
+func NewToutiao() *ToutiaoService {
 	gCurCookieJar, _ := cookiejar.New(nil)
 	client := http.Client{Jar: gCurCookieJar}
-	return &ToutiaoContainer{client: client}
+	return &ToutiaoService{client: client}
 }

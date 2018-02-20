@@ -28,7 +28,7 @@ func main() {
 		if err != nil {
 			fmt.Println(err)
 		}
-		err = session.Url("https://www.toutiao.com/a6524099463198278151/")
+		err = session.Url("https://www.toutiao.com/i6522432980709802510/")
 		if err != nil {
 			fmt.Println(err)
 		}

@@ -1,12 +1,20 @@
 package main
 
 import (
-	"hufen/toutiao"
 	"runtime"
+	"hufen/dandinglong"
 )
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	toutiao:=toutiao.NewToutiao()
-	toutiao.Login()
+
+	//toutiaoObj:=toutiao.NewToutiao()
+	//userInfo:=toutiaoObj.Login()
+	//fmt.Println(userInfo)
+	//userId:=strconv.Itoa(userInfo.UserId)
+	dandingObj:=dandinglong.DandinglongService{}
+	//danding.Register()
+	if dandingObj.Login(){
+		dandingObj.SaveAccount("asd")
+	}
 }
