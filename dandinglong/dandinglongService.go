@@ -23,12 +23,10 @@ func (d *DandinglongService)Login()  bool{
 	fmt.Println("输入密码")
 	fmt.Scan(&password)
 	mm := make(map[string]string)
-	mm["account"] = "zhangchun"//account
-	mm["password"] = "123123"//password
-	//postData,_:=json.Marshal(mm)
-	//req, _ :=http.NewRequest("POST","http://localhost:8080/login",strings.NewReader(string(postData)))
-	//req, _ :=http.NewRequest("GET","http://crm.easyrong.com/data/keyindex",nil)
-	req, _ :=http.NewRequest("GET","https://sso.toutiao.com/",nil)
+	mm["account"] = account
+	mm["password"] = password
+	postData,_:=json.Marshal(mm)
+	req, _ :=http.NewRequest("POST","http://localhost:8080/login",strings.NewReader(string(postData)))
 
 	req.Header.Set("Content-Type", "application/json")
 
@@ -96,7 +94,9 @@ func (d *DandinglongService)SaveAccount(account string) bool  {
 
 
 func NewDandinglongService() *DandinglongService {
-	dandingJar, _ := cookiejar.New(nil)
-	client := http.Client{Jar: dandingJar}
+	jar, _ := cookiejar.New(nil)
+	client := http.Client{
+		Jar: jar,
+	}
 	return &DandinglongService{client: client}
 }

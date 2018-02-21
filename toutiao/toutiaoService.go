@@ -70,6 +70,38 @@ func (tt *ToutiaoService) Login() ToutiaoLoginReturn{
 	}
 	return m
 }
+func (tt *ToutiaoService)Guanzhu(userId string) bool {
+	req,_:=http.NewRequest("POST","https://www.toutiao.com/c/user/follow/",strings.NewReader("user_id="+userId))
+	resp, _ := tt.client.Do(req)
+	data, _ := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	var m  =make(map[string]interface{})
+	err := json.Unmarshal([]byte(string(data)), &m)
+	if(err!=nil){
+		fmt.Println("error",err)
+		return false
+	}
+	fmt.Println(m)
+	return true
+}
+
+func (tt *ToutiaoService)SaveCookies()  {
+	req, _ :=http.NewRequest("GET","https://sso.toutiao.com/",nil)
+	cookieStr,_:=json.Marshal(tt.client.Jar.Cookies(req.URL))
+	ioutil.WriteFile("./cookieJson.txt", cookieStr, 0666) //写入文件(字节数组)
+}
+
+func (tt *ToutiaoService)LoadCookies()  {
+	req, _ :=http.NewRequest("GET","https://sso.toutiao.com/",nil)
+	res,_:=ioutil.ReadFile("./cookieJson.txt") //写入文件(字节数组)
+	var tmpJar []*http.Cookie
+	err:=json.Unmarshal(res,&tmpJar)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
+	tt.client.Jar.SetCookies(req.URL,tmpJar)
+}
 
 /**
 保存文件返回文件名

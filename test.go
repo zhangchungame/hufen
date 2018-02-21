@@ -1,50 +1,27 @@
 package main
 
 import (
-	"fmt"
-	"github.com/fedesog/webdriver"
-	"time"
+	"net/http/cookiejar"
+	"net/http"
+	"io/ioutil"
+	"encoding/json"
 )
 
-func main() {
-	chromeDriver := webdriver.NewChromeDriver("./chromedriver")
-	err := chromeDriver.Start()
-	if err != nil {
-		fmt.Println(err)
-	}
-	desired := webdriver.Capabilities{"Platform": "Linux"}
-	required := webdriver.Capabilities{}
-	sessiondanding, err := chromeDriver.NewSession(desired, required)
-	if err != nil {
-		fmt.Println(err)
-	}
-	err = sessiondanding.Url("http://www.dandinglong.site")
-	if err != nil {
-		fmt.Println(err)
-	}
-	session, err := chromeDriver.NewSession(desired, required)
-	var i int
-	for i=0;i<10;i++{
-		if err != nil {
-			fmt.Println(err)
-		}
-		err = session.Url("https://www.toutiao.com/i6522432980709802510/")
-		if err != nil {
-			fmt.Println(err)
-		}
-		time.Sleep(2 * time.Second)
-		el, _ :=session.FindElement(webdriver.TagName,"body");
-		bodysize, _ :=el.Size()
-		fmt.Println(bodysize)
-		cookie,_:=session.GetCookies()
-		fmt.Println(cookie)
-		key:="\ue00f"
-		session.SendKeysOnActiveElement(key)
-		time.Sleep(1 * time.Second)
-		session.SendKeysOnActiveElement(key)
-		time.Sleep(4 * time.Second)
-	}
 
-	session.Delete()
-	chromeDriver.Stop()
+func main() {
+	gCurCookieJar, _ := cookiejar.New(nil)
+	client := http.Client{Jar: gCurCookieJar}
+	header:=http.Header{}
+	header.Add("Host","www.toutiao.com")
+	header.Add("User-Agent","Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0")
+	header.Add("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+	header.Add("Accept-Language","zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2")
+	header.Add("Upgrade-Insecure-Requests","1")
+	//req, _ :=http.NewRequest("GET","http://crm.easyrong.com/",nil)
+	req, _ :=http.NewRequest("GET","https://sso.toutiao.com/",nil)
+	req.Header=header
+	resp, _ := client.Do(req)
+	resp.Body.Close()
+	cookieStr,_:=json.Marshal(client.Jar.Cookies(req.URL))
+	ioutil.WriteFile("./cookieJson.txt", cookieStr, 0666) //写入文件(字节数组)
 }
